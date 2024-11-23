@@ -1,7 +1,17 @@
+
 import { User } from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-
+function stringToSixDigitCode(input) {
+  // Create a hash value from the input string
+  let hash = 0;
+  for (let i = 0; i < input.length; i++) {
+      hash = (hash * 31 + input.charCodeAt(i)) % 1000000; // Keep the hash within a 6-digit range
+  }
+  // Ensure the result is a 6-digit number (pad with zeros if necessary)
+  //469628
+  return String(hash).padStart(6, '0');
+}
 export const register = async (req, resp) => {
   try {
     const { fullName, userName, password, confirmPassword, gender } = req.body;
@@ -64,6 +74,7 @@ export const login = async (req, resp) => {
     const token = jwt.sign(tokenData, process.env.JWT_SECRET_KEY, {
       expiresIn: "1d",
     });
+    
 
     return resp
       .status(200)
@@ -85,16 +96,7 @@ export const login = async (req, resp) => {
   }
 };
 
-function stringToSixDigitCode(input) {
-  // Create a hash value from the input string
-  let hash = 0;
-  for (let i = 0; i < input.length; i++) {
-      hash = (hash * 31 + input.charCodeAt(i)) % 1000000; // Keep the hash within a 6-digit range
-  }
-  // Ensure the result is a 6-digit number (pad with zeros if necessary)
-  //469628
-  return String(hash).padStart(6, '0');
-}
+
 
 // Example usage:
 // const randomString = "mayank123456789";
