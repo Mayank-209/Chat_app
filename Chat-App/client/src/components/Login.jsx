@@ -28,7 +28,7 @@ function Login() {
       );
 
       console.log(res);
-      navigate("/Auth");
+      navigate("/");
       dispatch(setAuthUser(res.data));
     } catch (error) {
       toast.error(error.response.data.message);

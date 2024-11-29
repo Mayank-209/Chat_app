@@ -1,8 +1,18 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
+import { useSelector } from "react-redux";
 
-function SingleMessage() {
+function SingleMessage({message}) {
+  const scroll=useRef()
+  const {authUser}=useSelector(store=>store.user)
+  console.log(message?.senderId);
+  console.log(authUser);
+  
+  
+  useEffect(()=>{
+    scroll.current?.scrollIntoView({behavior:"smooth"})
+  },[message])
   return (
-    <div className="chat chat-start">
+    <div ref={scroll} className={`chat ${authUser?._id===message?.senderId ?'chat-end': 'chat-start'}`}>
       <div className="chat-image avatar">
         <div className="w-10 rounded-full">
           <img
@@ -15,7 +25,7 @@ function SingleMessage() {
         
         <time className="text-xs opacity-50 text-red-400">12:45</time>
       </div>
-      <div className="chat-bubble">You were the Chosen One!</div>
+      <div className="chat-bubble">{message?.message}</div>
       
     </div>
   );
