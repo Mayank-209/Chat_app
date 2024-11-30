@@ -18,4 +18,4 @@ const verifyHashedData=async (unhashed,hashed)=>{
   }
 }
 
-export default {hashData}
+export default {hashData,verifyHashedData}

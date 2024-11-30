@@ -3,8 +3,35 @@ import generateOTP from "../utility/generateOTP.js";
 import sendEmail from "../utility/sendEmail.js"
 
 import hashDatas from "../utility/hashData.js"
-const {hashData}=hashDatas;
+const {hashData,verifyHashedData}=hashDatas;
 const { AUTH_EMAIL } = process.env;
+
+const verifyOTP=async ({email,otp})=>{
+  try {
+    if(!(email && otp)){
+      throw Error
+    }
+
+    const matchedOTPRecord=await OTP.findOne({email,})
+
+    if(!matchedOTPRecord){
+      throw Error("No otp records found")
+    }
+
+    const {expiresAt}=matchedOTPRecord;
+
+    if(expiresAt<Date.now()){
+      await OTP.deleteOne({email});
+      throw Error("Code hai expired. Request for a new one.")
+    }
+
+    const hashedOTP=matchedOTPRecord.otp
+    const validOTP=await verifyHashedData(otp,hashedOTP);
+    return validOTP
+  } catch (error) {
+    throw error
+  }
+}
 
 const sendOTP = async ({ email, subject, message, duration = 1 }) => {
   try {
@@ -60,4 +87,25 @@ const otpController=async (req, res) => {
   }
 }
 
-export default otpController;
+const verify= async(req,resp)=>{
+  try {
+    let {email,otp}=req.body
+
+    const validOTP=await verifyOTP({email,otp})
+
+    resp.status(200).json({vali:validOTP})
+
+  } catch (error) {
+    resp.status(400).send(error.message)
+  }
+}
+
+const deleteOTP=async (email)=>{
+  try {
+    await OTP.deleteOne({email})
+  } catch (error) {
+    throw error
+  }
+}
+
+export default {otpController,verify,deleteOTP};

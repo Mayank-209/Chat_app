@@ -6,11 +6,14 @@ import cookieParser from "cookie-parser";
 import messageRoutes from "./routes/messageRoutes.js";
 import cors from "cors";
 import otpRoutes from "./otp_/otpRoutes.js"
+import {app,server} from "./socket/socket.js"
+
+
 
 
 dotenv.config({});
 
-const app = express();
+
 const PORT = process.env.PORT || 4000;
 
 //middleware
@@ -30,7 +33,7 @@ app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/message", messageRoutes);
 app.use("/api/v1/otp",otpRoutes)
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   connectdb();
   console.log(`server listen at port ${PORT}`);
 });
