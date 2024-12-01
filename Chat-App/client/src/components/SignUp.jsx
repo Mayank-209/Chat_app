@@ -1,13 +1,18 @@
 import React, { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { setSemiAuthUser } from "../redux/userSlice";
+import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 
 import { Link, useNavigate } from "react-router-dom";
 function SignUp() {
   const navigate = useNavigate();
+  const {semiAuthUser}=useSelector(store=>store.user)
+  const dispatch=useDispatch()
   const [user, setUser] = useState({
     fullName: "",
-    userName: "",
+    userEmail: "",
     password: "",
     confirmPassword: "",
     gender: "",
@@ -19,28 +24,65 @@ function SignUp() {
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    try {
-      const res = await axios.post(
-        "http://localhost:5000/api/v1/user/register",
-        user,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      );
-      if (res.data.success) {
-        navigate("/login");
-        toast.success(res.data.message);
+    if (
+      !(
+        user.fullName &&
+        user.userEmail &&
+        user.password &&
+        user.confirmPassword &&
+        user.gender
+      )
+    ) {
+      alert("All fields are mandatory");
+      setUser({
+        fullName: "",
+        userEmail: "",
+        password: "",
+        confirmPassword: "",
+        gender: "",
+      });
+    } else {
+      if (user.confirmPassword !== user.password) {
+        alert("Password does not Match");
+        setUser({
+          fullName: "",
+          userEmail: "",
+          password: "",
+          confirmPassword: "",
+          gender: "",
+        });
       }
-    } catch (error) {
-      toast.error(error.response.data.message)
-      console.log(error);
+      else{
+        console.log(user);
+        
+        dispatch(setSemiAuthUser(user))
+       
+        navigate("/auth")
+      }
     }
+
+    // try {
+    //   const res = await axios.post(
+    //     "http://localhost:5000/api/v1/user/register",
+    //     user,
+    //     {
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //       },
+    //       withCredentials: true,
+    //     }
+    //   );
+    //   if (res.data.success) {
+    //     navigate("/login");
+    //     toast.success(res.data.message);
+    //   }
+    // } catch (error) {
+    //   toast.error(error.response.data.message)
+    //   console.log(error);
+    // }
     setUser({
       fullName: "",
-      userName: "",
+      userEmail: "",
       password: "",
       confirmPassword: "",
       gender: "",
@@ -65,11 +107,11 @@ function SignUp() {
           </div>
           <div>
             <label className="label p-2">
-              <span className="text-base label-text">User Name</span>
+              <span className="text-base label-text">User Email</span>
             </label>
             <input
               value={user.userName}
-              onChange={(e) => setUser({ ...user, userName: e.target.value })}
+              onChange={(e) => setUser({ ...user, userEmail: e.target.value })}
               className="w-full input input-bordered h-10"
               type="text"
               placeholder="Enter Your User Name"

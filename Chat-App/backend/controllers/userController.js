@@ -14,29 +14,37 @@ function stringToSixDigitCode(input) {
 }
 export const register = async (req, resp) => {
   try {
-    const { fullName, userName, password, confirmPassword, gender } = req.body;
-    if (!fullName || !userName || !password || !confirmPassword || !gender) {
+    const { fullName, userEmail, password, confirmPassword, gender } = req.body;
+    if (!fullName || !userEmail || !password || !confirmPassword || !gender) {
       return resp.status(400).json({ message: "All fields are required" });
     }
     if (password !== confirmPassword) {
       return resp.status(400).json({ message: "Password dosen't match" });
     }
 
-    const user = await User.findOne({ userName });
+    const user = await User.findOne({ userEmail });
     if (user) {
       return resp.status(400).json({ message: "Username already exists" });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const malePP = `https://avatar.iran.liara.run/public/boy?username=${userName}`;
-    const femalePP = `https://avatar.iran.liara.run/public/girl?username=${userName}`;
+    const malePP = `https://avatar.iran.liara.run/public/boy?username=${userEmail}`;
+    const femalePP = `https://avatar.iran.liara.run/public/girl?username=${userEmail}`;
+    let profPic=""
+    if(gender==="male"){
+      profPic=malePP;
+    }
+    else{
+      profPic=femalePP;
+    }
+    console.log(profPic);
 
     
     await User.create({
       fullName,
-      userName,
+      userEmail,
       password: hashedPassword,
-      profilePic: gender === "male" ? malePP : femalePP,
+      profilePic: profPic,
       gender,
     });
     return resp.status(201).json({
@@ -50,11 +58,11 @@ export const register = async (req, resp) => {
 
 export const login = async (req, resp) => {
   try {
-    const { userName, password } = req.body;
-    if (!userName || !password) {
+    const { userEmail, password } = req.body;
+    if (!userEmail || !password) {
       return resp.status(400).json({ message: "All fields are required" });
     }
-    const user = await User.findOne({ userName });
+    const user = await User.findOne({ userEmail });
     if (!user) {
       return resp.status(400).json({
         message: "Incorrect username or password",
@@ -87,7 +95,7 @@ export const login = async (req, resp) => {
       })
       .json({
         _id: user._id,
-        userName: user.userName,
+        userEmail: user.userEmail,
         fullName: user.fullName,
         profilePic: user.profilepic,
         message:"Logged in Successfully",
@@ -107,25 +115,7 @@ export const login = async (req, resp) => {
 
 
 
-export const authenticate=(req,resp)=>{
-  try {
-    const {userName}=req.body;
-    if (!userName) {
-      return resp.status(400).json({ message: "All fields are required" });
-    }
-    const now=new Date();
-    const key=userName+now.toISOString().slice(0,17);
-    const code=stringToSixDigitCode(key);
-    console.log(code);
-    return resp.status(200).json({
-      userCode:code,
-    })
 
-
-  } catch (error) {
-    console.log(error);
-  }
-}
 export const logout = (req, resp) => {
   try {
     return resp.status(200).cookie("token", "", { maxAge: 0 }).json({

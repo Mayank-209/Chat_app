@@ -12,7 +12,7 @@ const verifyOTP=async ({email,otp})=>{
       throw Error
     }
 
-    const matchedOTPRecord=await OTP.findOne({email,})
+    const matchedOTPRecord=await OTP.findOne({email})
 
     if(!matchedOTPRecord){
       throw Error("No otp records found")
@@ -38,8 +38,11 @@ const sendOTP = async ({ email, subject, message, duration = 1 }) => {
     if (!(email && subject && message)) {
       throw Error("Provide value for email, subject, message");
     }
-
-    // await OTP.deleteOne({ email });
+    const res= await OTP.findOne({email})
+    if(res){
+     await OTP.deleteOne({ email });
+    }
+    
 
     const generatedOTP =await generateOTP();
     console.log(generatedOTP);
@@ -74,6 +77,8 @@ const otpController=async (req, res) => {
   try {
     const { email, subject, message, duration } = req.body;
 
+    console.log(email);
+
     const createdOTP = await sendOTP({
       email,
       subject,
@@ -81,7 +86,9 @@ const otpController=async (req, res) => {
       duration,
     });
 
-    res.status(200).json(createdOTP);
+    res.status(200).json({
+      success:true
+    });
   } catch (error) {
     res.status(400).send(error.message);
   }
@@ -91,9 +98,13 @@ const verify= async(req,resp)=>{
   try {
     let {email,otp}=req.body
 
+    console.log(email,otp);
+
     const validOTP=await verifyOTP({email,otp})
 
     resp.status(200).json({vali:validOTP})
+    console.log(resp.data)
+    
 
   } catch (error) {
     resp.status(400).send(error.message)
