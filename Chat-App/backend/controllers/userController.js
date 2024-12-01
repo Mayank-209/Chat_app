@@ -31,6 +31,8 @@ export const register = async (req, resp) => {
     const malePP = `https://avatar.iran.liara.run/public/boy?username=${userEmail}`;
     const femalePP = `https://avatar.iran.liara.run/public/girl?username=${userEmail}`;
     let profPic=""
+    console.log(typeof(profPic));
+    
     if(gender==="male"){
       profPic=malePP;
     }
@@ -44,7 +46,7 @@ export const register = async (req, resp) => {
       fullName,
       userEmail,
       password: hashedPassword,
-      profilePic: profPic,
+      profilepic: profPic,
       gender,
     });
     return resp.status(201).json({

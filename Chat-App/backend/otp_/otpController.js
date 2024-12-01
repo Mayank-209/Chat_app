@@ -103,7 +103,7 @@ const verify= async(req,resp)=>{
     const validOTP=await verifyOTP({email,otp})
 
     resp.status(200).json({vali:validOTP})
-    console.log(resp.data)
+    
     
 
   } catch (error) {

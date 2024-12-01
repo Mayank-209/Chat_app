@@ -23,7 +23,7 @@ function Other(props) {
       >
         <div className={`avatar ${isOnline?'online':''}`}>
           <div className="w-12 rounded-full ">
-            <img src={user?.profilePhoto} alt="user-profile" />
+            <img src={user?.profilepic} alt="user-profile" />
           </div>
         </div>
         <div className="flex flex-col flex-1">

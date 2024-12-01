@@ -18,7 +18,7 @@ function MessageContainer() {
         <div className="avatar online">
           <div className="w-12 rounded-full ">
             <img
-              src={selectedUser?.profilePhoto}
+              src={selectedUser?.profilepic}
               alt="user-profile"
             />
           </div>
